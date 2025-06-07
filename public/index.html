@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Webmail Saya</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login Webmail</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageEl = document.getElementById('message');
+            
+            messageEl.textContent = "Memproses login...";
+            messageEl.className = "message processing";
+
+            try {
+                const response = await fetch('/.netlify/functions/auth', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Simpan token di localStorage
+                    localStorage.setItem('authToken', data.token);
+                    window.location.href = '/dashboard.html';
+                } else {
+                    messageEl.textContent = data.error || "Login gagal!";
+                    messageEl.className = "message error";
+                }
+            } catch (err) {
+                messageEl.textContent = "Koneksi error. Coba lagi!";
+                messageEl.className = "message error";
+                console.error("Login error:", err);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Webmail Saya</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Webmail Dashboard</h1>
+            <button id="logoutBtn">Logout</button>
+        </header>
+        
+        <div class="user-info">
+            <h2 id="userEmail">Loading...</h2>
+            <p>Selamat datang di sistem webmail</p>
+        </div>
+        
+        <div class="inbox">
+            <h3>Kotak Masuk</h3>
+            <div id="emails" class="emails-list">
+                <!-- Daftar email akan diisi oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cek token saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('authToken');
+            const userEmailEl = document.getElementById('userEmail');
+            
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                // Tampilkan email user (contoh)
+                userEmailEl.textContent = localStorage.getItem('userEmail') || 'user@example.com';
+                
+                // Di sini bisa ditambahkan kode untuk mengambil email
+                // menggunakan fungsi Netlify lain
+            } catch (err) {
+                console.error("Dashboard error:", err);
+            }
+        });
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userEmail');
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>
