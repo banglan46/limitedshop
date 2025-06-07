@@ -1,46 +1,47 @@
-const axios = require('axios');
-
 exports.handler = async (event) => {
-    try {
-        const { email, password } = JSON.parse(event.body);
-        
-        // API_KEY sudah diset di Netlify Environment Variables
-        const API_KEY = process.env.MAIL_SERVICE_API_KEY;
-        
-        // Contoh integrasi dengan layanan email API
-        const response = await axios.post(
-            'https://api.smtp.dev/account',
-            { 
-                email, 
-                password,
-                client_id: 'webmail-app' 
-            },
-            {
-                headers: {
-                    'X-API-Key': API_KEY,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+  try {
+    const { email, password } = JSON.parse(event.body);
+    const API_KEY = process.env.MAIL_SERVICE_API_KEY;
+    
+    // Ganti dengan API endpoint asli Anda
+    const API_ENDPOINT = "https://api.smtp.dev/accounts";
+    
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "X-API-Key": API_KEY,
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({ 
+        email, 
+        password,
+        client_id: "webmail-app" 
+      })
+    });
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                token: response.data.access_token,
-                user: {
-                    email: response.data.email,
-                    name: response.data.name
-                }
-            })
-        };
-    } catch (error) {
-        // Tangani error dari API eksternal
-        const status = error.response?.status || 500;
-        const message = error.response?.data?.error || 'Login gagal';
-
-        return {
-            statusCode: status,
-            body: JSON.stringify({ error: message })
-        };
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Login gagal");
     }
+
+    const data = await response.json();
+    
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        token: data.access_token,
+        user: {
+          email: data.email,
+          name: data.name
+        }
+      })
+    };
+  } catch (error) {
+    return {
+      statusCode: error.response?.status || 500,
+      body: JSON.stringify({ 
+        error: error.message || "Terjadi kesalahan" 
+      })
+    };
+  }
 };
