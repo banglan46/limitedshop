@@ -9,7 +9,7 @@ exports.handler = async (event) => {
         
         // Contoh integrasi dengan layanan email API
         const response = await axios.post(
-            'https://api.smtp.dev/accounts',
+            'https://api.smtp.dev/tokens',
             { 
                 email, 
                 password,
